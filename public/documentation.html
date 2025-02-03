@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Seattle Locations Documentation</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
   </head>
   <body>
     <p>
@@ -12,7 +13,102 @@
       Seattle loccations web app where a user can create an account,
       login/authenticate themselves, update their profile and get information
       about various locations in the city of Seattle. This web app will use
-      express to make it's server requests
+      express to make its server requests
     </p>
+    <h3>Endpoints:</h3>
+    <table>
+      <thead>
+        <th scope="col">Url Endpoint</th>
+        <th scope="col">Method</th>
+        <th scope="col">Description</th>
+        <th scope="col">Format</th>
+        <th scope="col">Request Example</th>
+        <th scope="col">Response Example</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>/locations</td>
+          <td>GET</td>
+          <td>Gets a list of all locations</td>
+          <td>None</td>
+          <td>None</td>
+          <td>An array of JSON objects holding data about each location</td>
+        </tr>
+        <tr>
+          <td>/users</td>
+          <td>POST</td>
+          <td>Allows a user to register for an account</td>
+          <td>JSON</td>
+          <td>{username: "", password: "", email: "", birthday: ""}</td>
+          <td>
+            {Username: "chosen name", UserID: "assigned user ID", Password:
+            "chosen password", Email: "chosen email", Birthday: "chosen
+            birthday", FavoriteLocations: []}
+          </td>
+        </tr>
+        <tr>
+          <td>/locations/:title</td>
+          <td>GET</td>
+          <td>Gets a location by its title</td>
+          <td>None</td>
+          <td>None</td>
+          <td>
+            {"Title": "", "Description": "", "LocatedAt": {"FromStadiums": ""},
+            "DateNamed": ""}
+          </td>
+        </tr>
+
+        <td>/locations/locatedat/:direction</td>
+        <td>GET</td>
+        <td>
+          Gets a location based on where it is at in relation to the stadiums
+          downtown
+        </td>
+        <td>None</td>
+        <td>None</td>
+        <td>{"FromStadiums": ""}</td>
+        <tr>
+          <td>/users/:id</td>
+          <td>PUT</td>
+          <td>Allows a user to update thier information</td>
+          <td>JSON</td>
+          <td>{ "Username": "Updated user name" }</td>
+          <td>
+            {"Username": "Updated user name", "UserID": "assigned userID",
+            "FavoriteLocations": [] }
+          </td>
+        </tr>
+        <tr>
+          <td>/users/:id/:locationTitle</td>
+          <td>POST</td>
+          <td>Adds a location to a users list of favorites</td>
+          <td>None</td>
+          <td>None</td>
+          <td>
+            A JSON object containing a user's updated array of favorite
+            locations
+          </td>
+        </tr>
+        <tr>
+          <td>/users/:id/:locationTitle</td>
+          <td>DELETE</td>
+          <td>Removes a location from a users list of favorites</td>
+          <td>None</td>
+          <td>None</td>
+          <td>
+            A JSON object containing a user's updated array of favorite
+            locations
+          </td>
+        </tr>
+        <tr>
+          <td>/users/:id</td>
+          <td>DELETE</td>
+          <td>Allows a user to delete their account</td>
+          <td>None</td>
+          <td>None</td>
+          <td>None</td>
+        </tr>
+      </tbody>
+    </table>
   </body>
 </html>
