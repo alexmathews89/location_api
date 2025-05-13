@@ -1,3 +1,14 @@
+const mongoose = require("mongoose");
+const Models = require("./models.js");
+
+const Locations = Models.Location;
+const Users = Models.User;
+
+mongoose.connect("mongodb://localhost:27017/locationDB", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
@@ -7,7 +18,7 @@ const uuid = require("uuid");
 app.use(morgan("common"));
 app.use(bodyParser.json());
 
-let users = [
+/**let users = [
   {
     Username: "Mary",
     UserID: 1,
@@ -86,7 +97,7 @@ let locations = [
     LocatedAt: { FromStadiums: "South" },
     DateNamed: "1850",
   },
-];
+];  */
 
 // GET Requests
 
@@ -98,105 +109,161 @@ app.get("/documentation", (req, res) => {
   res.sendFile("public/documentation.html", { root: __dirname });
 });
 
-app.get("/locations", (req, res) => {
-  res.status(200).json(locations);
+app.get("/locations", async (req, res) => {
+  await Locations.find()
+    .then((locations) => {
+      res.status(201).json(locations);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
-app.get("/locations/:title", (req, res) => {
-  const { title } = req.params;
-  const location = locations.find((location) => location.Title === title);
-
-  if (location) {
-    res.status(200).json(location);
-  } else {
-    res.status(404).send("Location not found");
-  }
+app.get("/users", async (req, res) => {
+  await Users.find()
+    .then((users) => {
+      res.status(200).json(users);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
-app.get("/locations/locatedat/:direction", (req, res) => {
-  const { direction } = req.params;
-  const locatedat = locations.find(
-    (location) => location.LocatedAt.FromStadiums === direction
-  ).LocatedAt;
+app.get("/users/:Username", async (req, res) => {
+  await Users.findOne({ Username: req.params.Username })
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
+});
 
-  if (locatedat) {
-    res.status(200).json(locatedat);
-  } else {
-    res.status(402).send("Location not found");
-  }
+app.get("/locations/:title", async (req, res) => {
+  await Locations.findOne({ Title: req.params.title })
+    .then((location) => {
+      res.json(location);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
+});
+
+app.get("/locations/locatedat/:direction", async (req, res) => {
+  await Locations.find({ "LocatedAt.FromStadiums": req.params.direction })
+    .then((location) => {
+      res.json(location);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
 //CREATE Requests
 
-app.post("/users", (req, res) => {
-  const newUser = req.body;
-
-  if (newUser.Username) {
-    newUser.UserID = uuid.v4();
-    users.push(newUser);
-    res.status(201).json(newUser);
-  } else {
-    res.status(400).send("users need names");
-  }
+app.post("/users", async (req, res) => {
+  await Users.findOne({ Username: req.body.Username })
+    .then((user) => {
+      if (user) {
+        return res.status(400).send(req.body.Username + "already exists");
+      } else {
+        Users.create({
+          Username: req.body.Username,
+          Password: req.body.Password,
+          Email: req.body.Email,
+          Birthday: req.body.Birthday,
+        })
+          .then((user) => {
+            res.status(201).json(user);
+          })
+          .catch((error) => {
+            console.error(error);
+            res.status(500).send("Error: " + error);
+          });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error: " + error);
+    });
 });
 
-app.post("/users/:id/:locationTitle", (req, res) => {
-  const { id, locationTitle } = req.params;
-
-  let user = users.find((user) => user.UserID == id);
-
-  if (user) {
-    user.FavoriteLocations.push(locationTitle);
-    res.status(200).send(`${locationTitle} has been added to ${id}'s array`);
-  } else {
-    res.status(400).send("No such user");
-  }
+// Adds a location to a users list of favorites
+app.post("/users/:Username/locations/:locationID", async (req, res) => {
+  await Users.findOneAndUpdate(
+    { Username: req.params.Username },
+    { $push: { FavoriteLocations: req.params.locationID } },
+    { new: true }
+  )
+    .then((updatedUser) => {
+      res.json(updatedUser);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
 // UPDATE Requests
 
-app.put("/users/:id", (req, res) => {
-  const { id } = req.params;
-  const updatedUser = req.body;
-
-  let user = users.find((user) => user.UserID == id);
-
-  if (user) {
-    user.Username = updatedUser.Username;
-    res.status(200).json(user);
-  } else {
-    res.status(400).send("No such user");
-  }
+app.put("/users/:Username", async (req, res) => {
+  await Users.findOneAndUpdate(
+    { Username: req.params.Username },
+    {
+      $set: {
+        Username: req.body.Username,
+        Password: req.body.Password,
+        Email: req.body.Email,
+        Birthday: req.body.Birthday,
+      },
+    },
+    { new: true }
+  )
+    .then((updatedUser) => {
+      res.json(updatedUser);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
 // DELETE Requests
 
-app.delete("/users/:id/:locationTitle", (req, res) => {
-  const { id, locationTitle } = req.params;
-
-  let user = users.find((user) => user.UserID == id);
-
-  if (user) {
-    user.FavoriteLocations.filter((title) => title !== locationTitle);
-    res
-      .status(200)
-      .send(`${locationTitle} has been removed from ${id}'s array`);
-  } else {
-    res.status(400).send("No such user");
-  }
+//Removes a location from a users list of favorites
+app.delete("/users/:Username/locations/:locationID", async (req, res) => {
+  await Users.findOneAndUpdate(
+    { Username: req.params.Username },
+    { $pull: { FavoriteLocations: req.params.locationID } },
+    { new: true }
+  )
+    .then((updatedUser) => {
+      res.json(updatedUser);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
-app.delete("/users/:id", (req, res) => {
-  const { id } = req.params;
-
-  let user = users.find((user) => user.UserID == id);
-
-  if (user) {
-    users = users.filter((user) => user.UserID != id);
-    res.status(200).send(`User ${id} has been deleted`);
-  } else {
-    res.status(400).send("No such user");
-  }
+app.delete("/users/:Username", async (req, res) => {
+  await Users.findOneAndDelete({ Username: req.params.Username })
+    .then((user) => {
+      if (!user) {
+        res.status(400).send(req.params.Username + " was not found");
+      } else {
+        res.status(200).send(req.params.Username + " was deleted.");
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
 app.use((err, req, res, next) => {

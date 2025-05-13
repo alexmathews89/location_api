@@ -36,14 +36,24 @@
         </tr>
         <tr>
           <td>/users</td>
-          <td>POST</td>
-          <td>Allows a user to register for an account</td>
-          <td>JSON</td>
-          <td>{username: "", password: "", email: "", birthday: ""}</td>
+          <td>GET</td>
+          <td>Gets an array of all users</td>
+          <td>None</td>
+          <td>None</td>
           <td>
-            {Username: "chosen name", UserID: "assigned user ID", Password:
-            "chosen password", Email: "chosen email", Birthday: "chosen
-            birthday", FavoriteLocations: []}
+            An array of JSON objects representing each individual user: [
+            {Username: User1}, {Username: User2}, {Username: User3}]
+          </td>
+        </tr>
+
+        <tr>
+          <td>/users/:Username</td>
+          <td>GET</td>
+          <td>Gets a user by their username</td>
+          <td>None</td>
+          <td>None</td>
+          <td>
+            A JSON object containing the requested user and their information
           </td>
         </tr>
         <tr>
@@ -68,45 +78,48 @@
         <td>None</td>
         <td>{"FromStadiums": ""}</td>
         <tr>
-          <td>/users/:id</td>
-          <td>PUT</td>
-          <td>Allows a user to update thier information</td>
-          <td>JSON</td>
-          <td>{ "Username": "Updated user name" }</td>
-          <td>
-            {"Username": "Updated user name", "UserID": "assigned userID",
-            "FavoriteLocations": [] }
-          </td>
-        </tr>
-        <tr>
-          <td>/users/:id/:locationTitle</td>
+          <td>/users</td>
           <td>POST</td>
-          <td>Adds a location to a users list of favorites</td>
-          <td>None</td>
-          <td>None</td>
+          <td>Allows a user to register for an account</td>
+          <td>JSON</td>
+          <td>{username: "", password: "", email: "", birthday: ""}</td>
           <td>
-            A JSON object containing a user's updated array of favorite
-            locations
+            {Username: "chosen name", UserID: "assigned user ID", Password:
+            "chosen password", Email: "chosen email", Birthday: "chosen
+            birthday", FavoriteLocations: []}
           </td>
         </tr>
         <tr>
-          <td>/users/:id/:locationTitle</td>
-          <td>DELETE</td>
-          <td>Removes a location from a users list of favorites</td>
-          <td>None</td>
-          <td>None</td>
-          <td>
-            A JSON object containing a user's updated array of favorite
-            locations
-          </td>
+          <td>/users/:Username/locations/:locationID</td>
+          <td>POST</td>
+          <td>Allows a user to add a location to their list of favorites</td>
+          <td>JSON</td>
+          <td>{Username: User1, FavoriteLocations: []}</td>
+          <td>{Username: User1, FavoriteLocations: [newLocationAdded]}</td>
         </tr>
         <tr>
-          <td>/users/:id</td>
+          <td>/users/:Username</td>
+          <td>PUT</td>
+          <td>Allows a user to update their information</td>
+          <td>JSON</td>
+          <td>{Username: User}</td>
+          <td>{Username: updatedUser}</td>
+        </tr>
+        <tr>
+          <td>/users/:Username/locations/:locationID</td>
           <td>DELETE</td>
-          <td>Allows a user to delete their account</td>
+          <td>Removes a location from a user's list of favorites</td>
+          <td>JSON</td>
+          <td>{Username: User, FavoriteLocations: [favoriteLocation]}</td>
+          <td>{Username: User, FavoriteLocations: []}</td>
+        </tr>
+        <tr>
+          <td>/users/:Username</td>
+          <td>DELETE</td>
+          <td>Allows a user to deregister</td>
           <td>None</td>
           <td>None</td>
-          <td>None</td>
+          <td>A message saying the user was sucessfully deleted</td>
         </tr>
       </tbody>
     </table>
