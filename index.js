@@ -360,7 +360,7 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something broke!");
 });
 
-//Listens for requests
+//Listens for requests through an evironment variable
 
 /** 
 app.listen(8080, () => {
