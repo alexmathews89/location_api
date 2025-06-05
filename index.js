@@ -4,7 +4,14 @@ const Models = require("./models.js");
 const Locations = Models.Location;
 const Users = Models.User;
 
+/** 
 mongoose.connect("mongodb://localhost:27017/locationDB", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+*/
+
+mongoose.connect(process.env.CONNECTION_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
