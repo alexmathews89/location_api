@@ -44,7 +44,7 @@ app.get("/documentation", (req, res) => {
 
 app.get(
   "/locations",
-  passport.authenticate("jwt", { session: false }),
+  /* passport.authenticate("jwt", { session: false }),  **/
   async (req, res) => {
     await Locations.find()
       .then((locations) => {
